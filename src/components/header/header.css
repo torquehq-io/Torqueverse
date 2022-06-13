@@ -1,0 +1,206 @@
+/* 
+
+
+.header-right .btn {
+  float: left;
+  border: inherit;
+   color: ivory; 
+  background-color: inherit;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  text-align: center;
+  padding: 15px;
+  
+  margin-top: 5px;
+  text-decoration: none;
+  font-size: 22px;
+  line-height: 25px;
+  border-radius: 4px;
+  transition: 1.3s;
+}
+
+[data-theme="dark"] .header-right .btn{
+  color:ivory;
+  transition: 1.3s;
+}
+
+.header button:hover {
+  background-color:black;
+  color: white;
+  
+}
+[data-theme="dark"] .header button:hover{
+  background-color: #3e83c7;
+  color: inherit;
+  
+}
+
+.btnwrapper{
+  margin-right: 80px;
+}
+
+
+.header .logo { 
+  align-content: center;
+ float: left;
+  height: 90%;
+  margin-left: 18px;
+  margin-top: 5px;
+ 
+}
+
+
+
+
+@keyframes wobble-to-top-right {
+  	16.65% {
+  	    -ms-transform: translate(8px, -8px);
+	    -webkit-transform: translate(8px, -8px);
+	    transform: translate(8px, -8px);
+  	}
+  	33.3% {
+  		-ms-transform: translate(-6px, 6px);
+	    -webkit-transform: translate(-6px, 6px);
+	    transform: translate(-6px, 6px);
+  	}
+  	49.95% {
+  		-ms-transform: translate(4px, -4px);
+	    -webkit-transform: translate(4px, -4px);
+	    transform: translate(4px, -4px);
+  	}
+  	66.6% {
+  		-ms-transform: translate(-2px, 2px);
+	    -webkit-transform: translate(-2px, 2px);
+	    transform: translate(-2px, 2px);
+  	}
+  	83.25% {
+  		-ms-transform: translate(1px, -1px);
+	    -webkit-transform: translate(1px, -1px);
+	    transform: translate(1px, -1px);
+  	}
+  	100% {
+  		-ms-transform: translate(0, 0);
+	    -webkit-transform: translate(0, 0);
+	    transform: translate(0, 0);
+  	}
+}
+
+
+
+
+
+
+
+.header-right {
+  float: right;
+  padding-top: 17px;
+}
+
+.header-right  a{
+  width:950px;
+}
+
+
+
+
+.grid-container-1 {
+  display: grid;
+  grid-template-columns: auto auto auto ;
+   grid-template-rows: 100px 300px; 
+  grid-gap: 105px ;
+  background-color: inherit;
+  padding: 0px;
+  
+  
+}
+
+.grid-container-1 > div {
+  background-color:inherit;
+  text-align: center;
+   padding: 20px 0; 
+  font-size: 20px;
+  font-weight: bold;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto  ;
+
+  grid-gap: 20px;
+  text-align: center;
+  background-color: inherit;
+  padding: 10px 0px 0px 0px;
+}
+
+.grid-container > div {
+  background-color:inherit;
+  box-shadow:1px 0px 10px 5px rgb(37, 37, 102);
+ 
+  padding:fit-content;
+  border-radius: 15px;
+   font-size: 20px; 
+   text-decoration:none; 
+}
+
+ Bitski button 
+.grid-container > div.item1 > .btn{
+  width: 90%;
+  height: 90%;
+  padding: 14px 14px 14px 14px;
+  cursor: pointer; 
+  border-radius: 15px;
+}
+
+.grid-container > div.item1 > .btn > ul{
+  padding: 0px;
+  text-align: center;
+}
+
+
+
+ social login grid 
+.grid-container > div  > div.item3{
+  
+  font-size: 20px;
+  font-weight: bold;
+  padding: 7px 7px 7px 7px;
+  
+  box-shadow:0px 1px 1px 1px rgb(37, 37, 102);
+  display: grid;
+  
+  grid-gap: 10px;
+   grid-template-rows: 10px 25px;  
+  margin: 12px;
+  border-radius: 15px;
+  background-color:inherit;
+  box-shadow:1px 0px 10px 3px rgb(106, 125, 146);
+  }
+
+ facebook button 
+  .grid-container > div  > div.item3 > .btn{
+    width: 94%;
+    cursor: pointer; 
+    margin: auto;
+    border-radius: 15px;
+    align-items: center;
+    display: flex;
+  }
+
+
+ metamask button   
+  .grid-container > div.item3 > .btn{
+    width: 90%;
+    height: 90%;
+    padding: 14px 14px 14px 14px;
+    cursor: pointer; 
+    border-radius: 15px;
+   
+    
+  }
+  .grid-container > div.item3 > button > ul{
+    padding: 0px;
+    text-align: center;
+  }
+  
+   */

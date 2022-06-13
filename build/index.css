@@ -1,0 +1,31 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+
+  
+  .brightness-box i{
+    margin: 0 10px;
+  }
+  
+  #range{
+    width: 100%;
+    -webkit-appearance: none;
+    background: #0a85ff;
+    height: 2px;
+    outline: none;
+    border-radius:50%;
+    
+  }
+  
+  #range::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    background: rgb(145, 145, 145);
+    border-radius: 30%;
+    cursor: pointer;
+  }
+  

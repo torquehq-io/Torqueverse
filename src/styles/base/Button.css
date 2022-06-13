@@ -1,0 +1,36 @@
+[data-theme="dark"] .default-button {
+    color: #ffffff;
+    border:none;
+    background-color: transparent;
+    /* color:#ffffff; */
+    border:1px solid #ffffff;
+    border-radius: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    cursor:pointer;
+    padding:2px;
+}
+
+[data-theme="dark"] .default-button:hover{
+    color:rgb(255, 255, 255);
+    background-color: #27303b;
+}
+
+.default-button {
+    border:none;
+    background-color: black;
+    /* color:#ffffff; */
+    border:1px solid #000000;
+    border-radius: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    cursor:pointer;
+    padding:2px;
+    background:  transparent;
+}
+
+.default-button:hover{
+    color:rgb(255, 251, 251);
+    background-color: #C1BEBE;
+    
+}
