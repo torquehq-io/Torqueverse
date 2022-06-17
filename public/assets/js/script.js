@@ -329,13 +329,15 @@ var mySwiper = new Swiper(".swiper_games", {
 
 function makeTimer() {
 
-	//		var endTime = new Date("29 April 2018 9:56:00 GMT+01:00");	
-	var endTime = new Date("29 April 2023 9:56:00 GMT+01:00");
+	var endTime = new Date("29 April 2018 10:17:00 GMT+05:30");	
+	var start = (new Date().getTime()/ 1000);
+	// var endTime = new Date().getTime();
+	// console.log(start)
 	endTime = (Date.parse(endTime) / 1000);
 
 	var now = new Date();
+	// console.log(now)
 	now = (Date.parse(now) / 1000);
-
 	var timeLeft = endTime - now;
 
 	var days = Math.floor(timeLeft / 86400);
@@ -355,6 +357,7 @@ function makeTimer() {
 }
 
 setInterval(function () { makeTimer(); }, 1000);
+
 
 
 // Scroll Animation

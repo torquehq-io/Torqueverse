@@ -3,35 +3,67 @@ import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate  } from "react-router-dom";
-import ListModal from "./ListModal";
+import {LikeButton} from '@lyket/react';
 import Web3Modal from "web3modal"
 import '../styles/Create.css'
 import Footer from "../components/Footer";
-import Header from "../components/Header"
+import Header from "../components/Header";
+// import DMyAssets from "../components/3Dmyasset"
 import {
   marketplaceAddress
-} from '../config'
+} from '../config';
 
 import { FaEthereum } from "react-icons/fa";
 import NFTMarketplace from '../NFTMarketplaceAbi.json'
 
 import '../styles/Creator-Dashboard.css'
+import { create as ipfsHttpClient } from 'ipfs-http-client'
 
-import { useEthers, useEtherBalance } from "@usedapp/core";
 import "../styles/CardList.css";
+// This function detects most providers injected at window.ethereum
 
 
+const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
 const MyAssets = (  ) => {
-	
-	
+  
+  
+  const [walletAddress, setWalletAddress] = useState("");
+ 
 	const navigate = useNavigate()
   
+  
+
+
   const [nfts, setNfts] = useState([])
+  
   const [loadingState, setLoadingState] = useState('not-loaded')
+  
   
   useEffect(() => {
     loadNFTs()
   }, [])
+
+  async function requestAccount() {
+    // console.log('Requesting account...');
+
+    // ❌ Check if Meta Mask Extension exists 
+    if(window.ethereum) {
+      // console.log('detected');
+
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setWalletAddress(accounts[0]);
+      } catch (error) {
+        console.log('Error connecting...');
+      }
+
+    } else {
+      alert('Meta Mask not detected');
+    }
+  }
+  
   async function loadNFTs() {
     const web3Modal = new Web3Modal({
       network: "mainnet",
@@ -40,7 +72,12 @@ const MyAssets = (  ) => {
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
-      
+    if(typeof window.ethereum !== 'undefined') {
+      await requestAccount();
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+    }
+
     const marketplaceContract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
     const data = await marketplaceContract.fetchMyNFTs()
     
@@ -48,39 +85,42 @@ const MyAssets = (  ) => {
       const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
       const meta = await axios.get(tokenURI)
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
-	  let auctionprice = ethers.utils.formatUnits(i.auctionprice.toString(), 'ether')
-
+     
+	    let auctionprice = ethers.utils.formatUnits(i.auctionprice.toString(), 'ether')
+      
       let item = {
+        
         price,
-		auctionprice,
+		    auctionprice,
         tokenId: i.tokenId.toNumber(),
         seller: i.seller,
+        likes:meta.data.likes,
         owner: i.owner,
         image: meta.data.image,
+        link:meta.data.link,
         name: meta.data.name,
 		description: meta.data.description,
         tokenURI
       }
       return item
+   
     }))
     setNfts(items)
+    
     setLoadingState('loaded') 
+    // return(account)
+   
+   
   }
   
- function listNFT(nft) {
-    console.log('nft:', nft);
 
-	navigate(`?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`);
-	//&Name=${nft.name}&Owner=${nft.owner}&Price=${nft.price}
-    // navigate(`/resell-nft?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
-	
-  }
+ 
 
  
  // #######################################
 
   const queryParams = new URLSearchParams(window.location.search)
-  const [formInput, updateFormInput] = useState({ price: '', image: '',Name:'',Owner:'',Price:'',auctionprice:'',AuctionPrice:'', })
+  const [formInput, updateFormInput] = useState({ price: '', image: '',link:'',Name:'',Owner:'',Price:'',auctionprice:'',AuctionPrice:'', })
 
   // const queries = queryString.parse(this.props.location.search)
   // this.setState(queries)
@@ -90,24 +130,44 @@ const MyAssets = (  ) => {
   const Name = queryParams.get("Name")
   const Owner = queryParams.get("Owner")
   const Price = queryParams.get("Price")
-  const AuctionPrice = queryParams.get("AuctionPrice")
   
-  const { image, price ,auctionprice} = formInput
+  const AuctionPrice = queryParams.get("AuctionPrice")
+  // document.getElementById("demo") = innerHTML
+  const { image,link, price ,auctionprice} = formInput
  
+  // if (username != null) {
+	// 	console.log("null")
+	//   document.getElementById("demo").innerText = "username ";
+	// }
+
+  function listNFT(nft) {
+    console.log('nft:', nft);
+  
+	navigate(`?id=${nft.tokenId}&tokenURI=${nft.tokenURI}&Name=${nft.name}&Price=${nft.price}&AuctionPrice=${nft.auctionprice}&Owner=${nft.owner}`);
+	
+	
+  }
+
  
 
   useEffect(() => {
-   
+    
+    
     fetchNFT()
+    
   }, [id])
 
   async function fetchNFT() {
     
     if (!tokenURI) return
+    
     const meta = await axios.get(tokenURI)
-    updateFormInput(state => ({ ...state, image: meta.data.image }))
+    updateFormInput(state => ({ ...state, image: meta.data.image }));
+    
+    
+    // document.getElementById("demo").innerHTML = "username"
+    
   }
-
 
   async function listNFTForSale() {
     if (!price)
@@ -117,18 +177,19 @@ const MyAssets = (  ) => {
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
-
+    
     const priceFormatted = ethers.utils.parseUnits(formInput.price, 'ether')
     let contract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
     let listingPrice = await contract.getListingPrice()
 
-    // listingPrice = listingPrice.toString()
+    listingPrice = listingPrice.toString()
 	console.log(listingPrice)
     let transaction = await contract.resellToken( id,priceFormatted, { value: listingPrice })
     await transaction.wait()
     navigate('/')
   }
 
+  
   async function listNFTForAuction() {
     if (!auctionprice)
 	return
@@ -136,43 +197,30 @@ const MyAssets = (  ) => {
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
     const signer = provider.getSigner()
-
+   
 	const auctionpriceFormatted = ethers.utils.parseUnits(formInput.auctionprice, 'ether')
     let contract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
     let listingPrice = await contract.getListingPrice()
     listingPrice = listingPrice.toString()
-	// console.log(listingPrice)
+	console.log(listingPrice)
     let transaction = await contract.createAuctionToken( id,auctionpriceFormatted, { value: listingPrice })
     await transaction.wait()
-    navigate('/explore')
+    navigate('/')
   }
+
+  
   
   function Details(nft) {
     console.log('nft:', nft);
 
-	navigate(`/detail?id=${nft.tokenId}&tokenURI=${nft.tokenURI}&Name=${nft.name}&Owner=${nft.owner}&Price=${nft.price}&AuctionPrice=${nft.auctionprice}&NFTDescription=${nft.description}`);
+	navigate(`/detail?id=${nft.tokenId}&tokenURI=${nft.tokenURI}&Name=${nft.name}&Price=${nft.price}&AuctionPrice=${nft.auctionprice}&NFTDescription=${nft.description}`);
     
   }
 
-
-  // nft auction Details
-  async function bidDetails(){
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-        marketplaceAddress,
-        NFTMarketplace.abi,
-        signer
-    );
-                       
-    let bids = await contract.getTokenAuctionDetails(id)
-    let maxBi = bids.maxBid/1000000000000000000
-    let maxBidUser = bids.maxBidUser
-
-  }
+ 
 // #######################################
+// document.getElementById("myImage").alt = "landscape.jpg";
+
 
 
   if (loadingState === 'loaded' && !nfts.length) 
@@ -181,12 +229,13 @@ const MyAssets = (  ) => {
 <Header/>
 
 
-<div class="mb-100" >
-			<div class="hero__profile">
+<div class="mb-100">
+
+			<div   class="hero__profile">
 				<div class="cover">
 					<img src="assets/img/bg/prrofile.png" alt=""/>
 				</div>
-				<div class="infos" >
+				<div class="infos">
 					<div class="container">
 						<div class="row flex-wrap align-items-center justify-content-between sm:space-y-50">
 							<div class="col-md-auto mr-20">
@@ -197,7 +246,7 @@ const MyAssets = (  ) => {
 											src="assets/img/avatars/avatar_4.png"
 											alt="avatar"/>
 									</div>
-									<h5>@My Profile</h5>
+									<h5></h5>
 								</div>
 							</div>
 							<div class="col-md-auto">
@@ -205,7 +254,7 @@ const MyAssets = (  ) => {
 									space-x-20 mb-20_reset d-sm-block">
 									<div class="mb-20">
 										<div class="copy">
-											<span  class="color_text" >{Owner}
+											<span  class="color_text " >{walletAddress}
 											</span>
 											<a>
 												<i class="ri-file-copy-line color_text"></i>
@@ -214,8 +263,9 @@ const MyAssets = (  ) => {
 									</div>
 									<div class="d-flex flex-wrap align-items-center
 										space-x-20">
+                     
 										<div class="mb-20">
-											<a href="404-7.html" class="btn btn-dark btn-sm">
+											<a  class="btn btn-dark btn-sm">
 												Follow
 											</a>
 		
@@ -275,10 +325,11 @@ const MyAssets = (  ) => {
 					</div>
 				</div>
 			</div>
+         
 		</div>
 
 
-  <div class="container" >
+  <div class="container">
 			<div class="row justify-content-center">
 	<div class="col-lg-3 col-md-7 order-md-0 order-1">
 					<div class="profile__sidebar">
@@ -440,7 +491,7 @@ const MyAssets = (  ) => {
                         alt="avatar"
                       />
                     </div>
-                    <h5>@My Profile</h5>
+                    <h5 ></h5>
                   </div>
                 </div>
                 <div class="col-md-auto">
@@ -450,7 +501,7 @@ const MyAssets = (  ) => {
                   >
                     <div class="mb-20">
                       <div class="copy">
-                        <span class="color_text">{Owner}</span>
+                        <span class="color_text ">{walletAddress}</span>
                         <a>
                           <i class="ri-file-copy-line color_text"></i>
                         </a>
@@ -460,10 +511,11 @@ const MyAssets = (  ) => {
                       class="d-flex flex-wrap align-items-center
 											space-x-20"
                     >
+                      
                       <div class="mb-20">
-                        <a href="404-7.html" class="btn btn-dark btn-sm">
+                        <button class="btn btn-dark btn-sm">
                           Follow
-                        </a>
+                        </button>
                       </div>
                       <div class="mb-20">
                         <div class="share">
@@ -537,11 +589,23 @@ const MyAssets = (  ) => {
       </div>
 
       <div class="container">
+      
         <div class="row justify-content-center">
           <div class="col-lg-3 col-md-7 order-md-0 order-1">
+          
             <div class="profile__sidebar">
+
               <div class="space-y-40">
                 <div class="space-y-10">
+                
+                <div  class="mb-20">
+             
+											<button    data-toggle="modal" data-target="#setprofile" class="btn btn-dark btn-sm">
+											Set Up Your Profile
+											</button>
+                
+										</div>
+                
                   <h5>About me</h5>
                   <div class="box space-y-20">
                     <p>
@@ -598,6 +662,13 @@ const MyAssets = (  ) => {
               </div>
               <p class="text-center txt_sm mt-20 color_text">Since 2021</p>
             </div>
+
+
+
+
+
+
+          
           </div>
 
           {/* ############################################################################################ */}
@@ -651,26 +722,57 @@ const MyAssets = (  ) => {
                     </div>
                   </div>
 
-                  <div class="tab-content" onLoad={()=> bidDetails()}>
+                  <div class="tab-content">
                     <div class="tab-pane active" id="tabs-1" role="tabpanel">
                       <div class="row mb-30_reset">
                         {nfts.map((nft, i) => (
-                          <div class="col-xl-4 col-lg-6 col-md-6">
+
+                          <div class="col-xl-3 col-xl-4 col-lg-6 col-md-6">
+
                             <div class="card__item three">
                               <div class="card_body space-y-10">
                                 <div key={i} class="card_head">
+                                  
+                                {/* <iframe  onClick={() => Details(nft)}
+                                    src={nft.link}
+                                    alt=""
+                                  /> */}
                                   <img
+                                    
                                     onClick={() => Details(nft)}
                                     src={nft.image}
                                     alt=""
                                   />
-                                  <a
-                                    class="likes
-																	space-x-3"
-                                  >
-                                    <i class="ri-heart-3-fill"></i>
-                                    <span class="txt_sm">1.2k</span>
-                                  </a>
+                                
+
+                                  {/* <DMyAssets/> */}
+                                    
+                                  
+                                
+                                <span class="txt_sm">
+               
+                                  <LikeButton  
+                                    namespace="faq"
+                                    hideCounterIfLessThan={1} >
+                                      
+                                  {({
+                                            handlePress,
+                                            
+                                            totalLikes,
+                                            userLiked,
+                                            isLoading,
+                                            isCounterVisible
+                                          })  => (
+                                          <a class="likes space-x-3 ml-10">
+                                            <i onClick={handlePress} disabled={isLoading} class="ri-heart-3-fill" ></i>
+                                            {totalLikes}
+                                        
+                                          </a>
+                                    )}
+                                    
+                                  </LikeButton>
+                              </span>
+
                                   <div class="action">
                                     {/* onClick={() => listNFT(nft)}   */}
                                     <button
@@ -691,7 +793,7 @@ const MyAssets = (  ) => {
 									btn-primary btn-sm
 									btn_auction"
                                       data-toggle="modal"
-                                      data-target="#popup_test"
+                                      data-target="#popup_bid"
                                     >
                                       <i
                                         class="ri-auction-line
@@ -705,7 +807,7 @@ const MyAssets = (  ) => {
                                 <h6 class="card_title">
                                   <a
                                     class="color_black"
-                                    href="Item-details.html"
+                                    
                                   >
                                     {nft.name}
                                   </a>
@@ -750,7 +852,7 @@ const MyAssets = (  ) => {
                                           class="avatars_name
 																				txt_sm"
                                         >
-                                          @My Assets
+                                          {nft.username}
                                         </p>
                                       </a>
                                     </div>
@@ -760,31 +862,32 @@ const MyAssets = (  ) => {
 																			txt_sm"
                                       >
                                         {" "}
+                                        
                                         {nft.price} <FaEthereum />
                                       </p>
                                     </a>
                                   </div>
-                                  {/* <div class="hr"></div> */}
-                                  {/* <div
+                                  <div class="hr"></div>
+                                  <div
                                     class="d-flex
 																	align-items-center
 																	space-x-10"
-                                  > */}
-                                    {/* <i class="ri-vip-crown-line"></i> */}
-                                    {/* <p
+                                  >
+                                    <i class="ri-vip-crown-line"></i>
+                                    <p
                                       class="color_text
 																		txt_sm"
                                       style={{ width: "auto" }}
                                     >
                                       Highest bid
-                                    </p> */}
-                                    {/* <span
+                                    </p>
+                                    <span
                                       class="color_black
 																		txt_sm"
                                     >
                                       0.022 ETH
-                                    </span> */}
-                                  {/* </div> */}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -1201,8 +1304,8 @@ const MyAssets = (  ) => {
                 <div class="modal-body space-y-20 p-40">
                   <h3>List Token</h3>
                   <p>
-                    You are Listing A Token{" "}
-                    <span class="color_black">{Name}</span> from
+                    You are Listing A Token {" "} 
+                    <span class="color_green">{Name}</span> from
                     <span class="color_red">{Owner}</span>
                   </p>
                   <div class="space-y-10">
@@ -1229,18 +1332,18 @@ const MyAssets = (  ) => {
                   </div>
 
                   <div class="hr"></div>
-                  {/* <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between">
                     <p> You must bid at least:</p>
                     <p class="text-right color_black txt _bold"> 67,000 ETH </p>
-                  </div> */}
+                  </div>
                   <div class="d-flex justify-content-between">
                     <p> service free:</p>
                     <p class="text-right color_black txt _bold"> 0.025 ETH </p>
                   </div>
-                  {/* <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between">
                     <p> Total bid amount:</p>
                     <p class="text-right color_black txt _bold"> 56,031 ETH </p>
-                  </div> */}
+                  </div>
                   <button
                     class="btn btn-primary
 			                    w-full"
@@ -1254,9 +1357,12 @@ const MyAssets = (  ) => {
             </div>
           </div>
 
+
+
+
           <div
             class="modal fade popup"
-            id="popup_test"
+            id="popup_bid"
             tabindex="-1"
             role="dialog"
             aria-hidden="true"
@@ -1274,12 +1380,12 @@ const MyAssets = (  ) => {
                 <div class="modal-body space-y-20 p-40">
                   <h3>Start Auction</h3>
                   <p>
-                    You are Listing A Token
+                    You are Listing A Token{" "}
                     <span class="color_black">{Name}</span> from
                     <span class="color_red">{Owner}</span>
                   </p>
                   <div class="space-y-10">
-                    {/* <p>Minimum Bid</p> */}
+                    <p>Minimum Bid</p>
                     <input
                       type="text"
                       class="form-control"
@@ -1302,18 +1408,18 @@ const MyAssets = (  ) => {
                   </div>
 
                   <div class="hr"></div>
-                  {/* <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between">
                     <p> You must bid at least:</p>
                     <p class="text-right color_black txt _bold"> 67,000 ETH </p>
-                  </div> */}
+                  </div>
                   <div class="d-flex justify-content-between">
                     <p> service free:</p>
                     <p class="text-right color_black txt _bold"> 0.025 ETH </p>
                   </div>
-                  {/* <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between">
                     <p> Total bid amount:</p>
                     <p class="text-right color_black txt _bold"> 56,031 ETH </p>
-                  </div> */}
+                  </div>
                   <button
                     class="btn btn-primary
 			                    w-full"
@@ -1328,7 +1434,83 @@ const MyAssets = (  ) => {
           </div>
 
          
+
+
+          <div
+            class="modal fade popup"
+            id="setprofile"
+            tabindex="-1"
+            role="dialog"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-body space-y-20 p-40">
+                  <h3>Set Your Profile </h3>
+                  <p>
+                    You are Listing A Token{" "}
+                    <span class="color_black"></span> from
+                    <span class="color_red"></span>
+                  </p>
+                  <div class="space-y-10">
+                    <p>Set UserName</p>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="00.00 ETH"
+                      onChange={(e) =>
+                        updateFormInput({ ...formInput, username: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div class="space-y-10">
+                    <p>
+                      Minimum Bid{"  "}
+                      <span class="color_green">
+                         <FaEthereum />
+                        ETH
+                      </span>
+                    </p>
+                    {/* <input type="text" class="form-control"
+			                        value="1"/> */}
+                  </div>
+
+                  <div class="hr"></div>
+                  <div class="d-flex justify-content-between">
+                    <p> You must bid at least:</p>
+                    <p class="text-right color_black txt _bold"> 67,000 ETH </p>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <p> service free:</p>
+                    <p class="text-right color_black txt _bold"> 0.025 ETH </p>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <p> Total bid amount:</p>
+                    <p class="text-right color_black txt _bold"> 56,031 ETH </p>
+                  </div>
+                  <button
+                    class="btn btn-primary
+			                    w-full"
+                    aria-label="Close"
+                    // onClick={() => setprofile()}
+                  >
+                   Set Up
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+     
       </div>
 
       <Footer />

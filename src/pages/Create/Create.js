@@ -106,10 +106,10 @@ const CreateItem = () => {
 	// const auctionprice = ethers.utils.parseUnits(formInput.auctionprice, 'ether')
 
     let contract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
-    // let mintingPrice = await contract.getMintingPrice()
+    let mintingPrice = await contract.getMintingPrice()
     // mintingPrice = mintingPrice.toString()
 	
-    let transaction = await contract.createToken(url, price )
+    let transaction = await contract.createToken(url, price, { value: mintingPrice } )
     await transaction.wait() 
     navigate('/my-assets')
   }

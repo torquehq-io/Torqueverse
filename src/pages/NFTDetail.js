@@ -14,22 +14,13 @@ import { ethers, Signer } from 'ethers'
 
 import axios from 'axios'
 
-// import Web3 from "web3";
 import "../styles/NFTCard.css";
-
-// import {
-//   nftaddress, nftmarketaddress
-// } from '../config'
-
-// import NFT from '../NFTAbi.json'
-// import Market from '../NFTMarketAbi.json'
+import jQuery from "jquery";
+// import $ from jQuery
 import {
     marketplaceAddress
 } from '../config'
 import NFTMarketplace from '../NFTMarketplaceAbi.json'
-import aaa from "./aaa.json"
-// var Web3 = require('web3');
-// var web3 = new Web3("https://rpc-mumbai.matic.today");
 const NFTDetail = () => {
 
 
@@ -50,26 +41,12 @@ const NFTDetail = () => {
 
 
 
-
-
-
-
-    //   useEffect(()=>{
-    //     if(moreNftListRef.current != null){
-    //       //moreNftListRef.current
-    //       moreNftListRef.current.addEventListener("wheel",()=>{
-
-    //       })
-    //     }
-    //   },[moreNftListRef])
-
-    //!! aciklama karakter sayisi sinirlanmali.
-    //!! scroll sorununa cozum bulunmali.
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // const [counter, setCounter] = React.useState(86401);
 
+    const [walletAddress, setWalletAddress] = useState("");
     const queryParams = new URLSearchParams(window.location.search)
-    const [formInput, updateFormInput] = useState({ price: '', image: '', Name: '', Owner: '', Price: '', NFTDescription: '', auctionprice: '', AuctionPrice: '', bidprice:'' })
+    const [formInput, updateFormInput] = useState({ price: '', image: '', Name: '', Owner: '', Price: '', NFTDescription: '', auctionprice: '', AuctionPrice: '', bidprice: '' })
 
     // const queries = queryString.parse(this.props.location.search)
     // this.setState(queries)
@@ -83,9 +60,9 @@ const NFTDetail = () => {
     const AuctionPrice = queryParams.get("AuctionPrice")
 
     const { image, price, auctionprice, bidprice } = formInput
-    
 
-
+    // wallet address 
+    let metaMaskaddress;
 
     useEffect(() => {
 
@@ -104,7 +81,7 @@ const NFTDetail = () => {
     const [loadingState, setLoadingState] = useState('not-loaded')
 
 
-    async function loadNFTs() {
+    async function loadNFTs(nft) {
         const web3Modal = new Web3Modal({
             network: "mainnet",
             cacheProvider: true,
@@ -116,7 +93,9 @@ const NFTDetail = () => {
         const marketplaceContract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
         const data = await marketplaceContract.fetchMyNFTs()
         const auctionData = await marketplaceContract.getTokenAuctionDetails()
-        console.log(auctionData);
+        // console.log(auctionData);
+        let details = await marketplaceContract.getTokenAuctionDetails(nft.tokenId)
+        // let maxBid = details.maxBid()
 
         const items = await Promise.all(data.map(async i => {
             const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
@@ -141,12 +120,42 @@ const NFTDetail = () => {
         }))
         setNfts(items)
         setLoadingState('loaded')
+
+
     }
+
+
+
+    async function requestAccount() {
+
+        // console.log('Requesting account...');
+
+        // ❌ Check if Meta Mask Extension exists 
+        if (window.ethereum) {
+            //   console.log('detected')
+
+            try {
+                const accounts = await window.ethereum.request({
+                    method: "eth_requestAccounts",
+                });
+                setWalletAddress(accounts[0]);
+                metaMaskaddress = accounts[0];
+                // console.log(accounts[0]);
+            } catch (error) {
+                // console.log('Error connecting...');
+            }
+
+        } else {
+            alert('Meta Mask not detected');
+        }
+
+    }
+
+
+
     ////////////////////////////////////////////   End Auction    /////////////////////////////////////
 
     async function endAuction(nft) {
-        /* needs the user to sign the transaction, so will use Web3Provider and sign it */
-        // console.log(`/detail?id=${nftid}&tokenURI=${tokenURI}&Name=${nftName}&Owner=${nftOwner}&Price=${nftPrice}&AuctionPrice=${nftAuctionPrice}&NFTDescription=${nftdescription}`)
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
@@ -156,70 +165,14 @@ const NFTDetail = () => {
             NFTMarketplace.abi,
             signer
         );
-        // let contract1 = new web3.eth.Contract(aaa,marketplaceAddress);
-        
-        // const listingPrice = await contract.getListingPrice()
-        // listingPrice = listingPrice.toString()
-        /* user will be prompted to pay the asking proces to complete the transaction */
-        // const price = ethers.utils.parseUnits(formInput.bidprice, "ether");
-        // const auctionprice = ethers.utils.parseUnits(nft.auctionprice.toString(), "ether");
+        // console.log(walletAddress)
         const transaction = await contract.executeSale(id);
-        // const transaction1 = await contract.WithdrawBids(id).send({from: marketplaceAddress});
-        // console.log(id)
         await transaction.wait();
         loadNFTs();
     }
 
-    async function buyNft(nft) {
-        /* needs the user to sign the transaction, so will use Web3Provider and sign it */
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-          marketplaceAddress,
-          NFTMarketplace.abi,
-          signer
-        );
 
-        let isActive = await contract.fetchMarketItems()
-        console.log(isActive)
-    
-        /* user will be prompted to pay the asking proces to complete the transaction */
-        const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
-        // const auctionprice = ethers.utils.parseUnits(nft.auctionprice.toString(), "ether");
-        const transaction = await contract.createMarketSale(nft.tokenId, {
-          value: price,
-        });
-        await transaction.wait();
-        loadNFTs();
-      }
-
-    
-
-    async function bidNft(nft) {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-            marketplaceAddress,
-            NFTMarketplace.abi,
-            signer
-        );
-
-        /* user will be prompted to pay the asking proces to complete the transaction */
-        const price = ethers.utils.parseUnits(formInput.bidprice, "ether");
-        // const auctionprice = ethers.utils.parseUnits(nft.auctionprice.toString(), "ether");
-        const transaction = await contract.bid(id, {
-            value: price,
-        });
-        await transaction.wait();
-        console.log("success")
-        navigate("/")
-        // setInterval(endAuction(nft), 60000);
-    }
-
+    ////////////////////////////////////////////   Withdraw Bid    /////////////////////////////////////
     async function withdwaw() {
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
@@ -254,8 +207,8 @@ const NFTDetail = () => {
     }
 
 
-
-    async function bidDetails(){
+    async function buyNft(nft) {
+        /* needs the user to sign the transaction, so will use Web3Provider and sign it */
         const web3Modal = new Web3Modal();
         const connection = await web3Modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
@@ -265,60 +218,193 @@ const NFTDetail = () => {
             NFTMarketplace.abi,
             signer
         );
-                           
-        let bids = await contract.getTokenAuctionDetails(id)
-        let maxBi = bids.maxBid/1000000000000000000
-        let maxBidUser = bids.maxBidUser
 
+        let active = await contract.getListingDetails(id)
+        console.log(active.isActive)
+        const price1 = active.price;
+        const transaction = await contract.createMarketSale(id, {
+            value: price1,
+        });
+        await transaction.wait();
+        loadNFTs();
+    }
+
+    // let seconds = 10;
+
+
+
+
+
+
+    async function bidNft(nft) {
+        /* needs the user to sign the transaction, so will use Web3Provider and sign it */
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+            marketplaceAddress,
+            NFTMarketplace.abi,
+            signer
+        );
+
+        let isActive = await contract.getTokenAuctionDetails(id)
+        let remain = isActive.isActive
+        let maxBid = isActive.maxBid / 1000000000000000000
+
+
+        const price = ethers.utils.parseUnits(formInput.bidprice, "ether");
+        const transaction = await contract.bid(id, {
+            value: price,
+        });
+
+        await transaction.wait();
+        console.log("success")
+        loadNFTs();
+    }
+
+    async function buttons(){
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+            marketplaceAddress,
+            NFTMarketplace.abi,
+            signer
+        );
         
-        // console.log(maxBid)
+        // let active1 = await contract.getListingDetails(id)
+        let bids = await contract.getTokenAuctionDetails(id)
+        let endTime = bids.endTime.toString();
+        // let WithdrawTime = bids.withdrawBidTime.toString()
+        let currentTime = Math.floor(new Date().getTime() / 1000).toString()
+        let EndTime24 = new Date(endTime*1000)
+        let StartTime24 = new Date(currentTime*1000)
+        EndTime24 = (Date.parse(EndTime24) / 1000);
+        StartTime24 = (Date.parse(StartTime24) / 1000);
+        var timeLeft = EndTime24 - StartTime24;
+
+        var days = Math.floor(timeLeft / 86400);
+        var hours = Math.floor((timeLeft - (days * 86400)) / 3600);
+        var minutes = Math.floor((timeLeft - (days * 86400) - (hours * 3600)) / 60);
+        var seconds = Math.floor((timeLeft - (days * 86400) - (hours * 3600) - (minutes * 60)));
+
+        if (hours < "10") { hours = "0" + hours; }
+        if (minutes < "10") { minutes = "0" + minutes; }
+        if (seconds < "10") { seconds = "0" + seconds; }
+        if(bids.isActive == true){
+            document.getElementById("setTime").innerHTML = `the Auction end in ${hours} : ${minutes}: ${seconds}`
+        }
+        if ( endTime <= currentTime && bids.isActive == true) {
+            document.getElementById("text0").innerHTML = `<h2>Auction is Ended</h2>`
+        }
+       
+    }
+    setInterval(buttons, 1000)
+
+
+    async function bidDetails(nft) {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+            marketplaceAddress,
+            NFTMarketplace.abi,
+            signer
+        );
+        await requestAccount();
+        let bids = await contract.getTokenAuctionDetails(id)
+        let maxBi = bids.maxBid / 1000000000000000000;
+        let maxBidUser = bids.maxBidUser;
+        let endTime = bids.endTime.toString();
+        let WithdrawTime = bids.withdrawBidTime.toString()
+        let currentTime = Math.floor(new Date().getTime() / 1000).toString()
         document.getElementById("BIDS").innerHTML = maxBi
         document.getElementById("BID").innerHTML = maxBidUser
-        console.log(bids.seller)
-        // if(bids.seller == signer){
-            // document.getElementById("EndAuction").innerHTML = "End Auction"
-            // if(bids.maxBi >0 ){
-            //     function Timer(){
-                    // setInterval(() => {
-                    // //     // let a = 24
-                    //     for(let a = 24; a>=0; a--){
-                    //         document.getElementById("counterh").innerHTML = a;
-                    //     }
-                    // }, 1000);
-            //     }
-            // }
-        // }
-        // // let bidAmount = bids.maxBi
-        // bidAmount.forEach(myfunc)
-        // function myfunc(value, index){
-        //     let bidsAll = value/1000000000000000000
-        //     const BidsAll = [];
-        //     BidsAll.push(bidsAll)
-        //     console.log(BidsAll)
+        // let auctionPrice = bids.AuctionPrice / 1000000000000000000;
+
+        let active = await contract.getListingDetails(id)
+        let seller = active.seller
+        let owner = active.owner
+
+        owner = owner.toUpperCase()
+        maxBidUser = maxBidUser.toUpperCase()
+        seller = seller.toUpperCase()
+        metaMaskaddress = metaMaskaddress.toUpperCase()
+
+
+        if (metaMaskaddress != seller) {
+            document.getElementById("text0").innerHTML = `<a href="#" data-toggle="modal"
+            data-target="#popup_bid" class="btn btn-grad btn-lg" 
+            >
+            Place Bid
+            </a>`
         }
 
-        // function Timer() {
-        //    setInterval(() => {
-        //        let a = 24
-        //        for(a = 24; a>=0; a--){
-        //            document.getElementById("counterh").innerHTML = a;
-        //        }
-        //    }, 3600);
-        // }
+        if (maxBidUser == metaMaskaddress && WithdrawTime <= currentTime) {
+            document.getElementById("text3").innerHTML = `<a href="#" class="btn btn-grad btn-lg"
+            >
+            Withdraw Bid
+            </a>`
+        }
+
+        if ( active.isActive == true) {
+            document.getElementById("text4").innerHTML = `<a href="#"  class="btn btn-grad btn-lg"
+            >
+            Buy Now
+            </a>`
+        }
+        // console.log(metaMaskaddress + "hello");
+        if (seller == metaMaskaddress ) {
+            document.getElementById("text2").innerHTML = `<a href="#" class="btn btn-grad btn-lg"
+            >
+            Execute Auction
+            </a>`
+            document.getElementById("text1").innerHTML = `<br><a href="#" class="btn btn-grad btn-lg"
+            >
+            Cancel Auction
+            </a>`
+        }
         
-        // jQuery(function ($) 
-        // {
-        //     var twentyFourHours = 24 * 60 * 60;
-        //     var display = $('#remainingTime');
-        //     Timer(twentyFourHours, display);
-        // });
+        
+        // setInterval(function () { bidDetails(); }, 1500);
+        // now = (Date.parse(now));
+        // start12 = (Date.parse(start12));
+        // var timeLeft = start024 - now;
+
+        // var days = Math.floor(timeLeft / 86400);
+        // var hours = Math.floor((timeLeft - (days * 86400)) / 3600);
+        // var minutes = Math.floor((timeLeft - (days * 86400) - (hours * 3600)) / 60);
+        // var seconds = Math.floor((timeLeft - (days * 86400) - (hours * 3600) - (minutes * 60)));
+        // // let start2 = start;
+
+        // if (hours < "10") { hours = "0" + hours; }
+        // if (minutes < "10") { minutes = "0" + minutes; }
+        // if (seconds < "10") { seconds = "0" + seconds; }
+
+        // $(".days").html(days + "<span></span>");
+        // $(".hours").html(hours + "<span></span>");
+        // $(".minutes").html(minutes + "<span></span>");
+        // $(".seconds").html(seconds + "<span></span>");
+        // document.getElementById("hours").innerHTML = hours;
+        // document.getElementById("minutes").innerHTML = minutes;
+        // document.getElementById("seconds").innerHTML = seconds;
+
+        // console.log(start024)
+
+    }
+
+
+
 
     /////////////////////////////////////////  ////////////////////////////////////////////////////////
 
     return (
-        <div onLoad={() => bidDetails()}>
+        <div onLoad={bidDetails}>
             <Header />
-            <div class="container">
+            <div class="container" >
                 <a href="/explore" class="btn btn-white btn-sm my-40">
                     Back to home
                 </a>
@@ -555,7 +641,7 @@ const NFTDetail = () => {
                                         <div class="col-lg-6">
                                             <div class="space-y-5">
                                                 <p class="color_text">Price:</p>
-                                                <h4>{" "}{Price}
+                                                <h4>{" "}{AuctionPrice}
                                                     <FaEthereum /><span class="txt_sm color_text">
                                                         ETH/ $4769.88</span></h4>
                                             </div>
@@ -570,20 +656,21 @@ const NFTDetail = () => {
                                         <div class="col-lg-6">
                                             <div class="space-y-5">
                                                 <p class="color_text">countdown</p>
-                                                <div class="d-flex countdown_item
+                                                <span id="setTime"></span>
+                                                {/* <div class="d-flex countdown_item
                                                     align-items-center">
                                                     <div class="item">
-                                                        <div class=""><span id="counterh"></span></div>
+                                                        <div class="number hours"><span></span></div>
                                                     </div>
                                                     <div class="dots">:</div>
                                                     <div class="item">
-                                                        <div class=""><span id="counterm"></span></div>
+                                                        <div class="number minutes"><span></span></div>
                                                     </div>
                                                     <div class="dots">:</div>
                                                     <div class="item">
-                                                        <div class=""><span id="counters"></span></div>
+                                                        <div class="number seconds"><span></span></div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
 
                                             </div>
@@ -635,27 +722,22 @@ const NFTDetail = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div >
-                                    <a class="btn btn-sm btn-grad btn-lg" href="#"
-                                        data-toggle="modal" data-target="#popup_bid">Place
-                                        Bid</a>
-                                    <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
-                                         onClick={() => endAuction(nfts)}>
-                                             <span id="EndAuction">end Auction</span>
-                                         </a>
-                                    <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
+
+                                    <a onClick={() => buyNft(nfts)} id="text0"></a>
+                                    <a id="text4"></a>
+                                    <a onClick={() => cancel()} id="text1"></a>
+                                    <a onClick={() => endAuction(nfts)} id="text2"></a>
+                                    <a onClick={() => withdwaw()} id="text3"></a>
+                                    {/* <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
                                          onClick={() => withdwaw()}>
                                              <span id="EndAuction">Withdraw Bid</span>
-                                         </a>
-                                    <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
+                                         </a> */}
+                                    {/* <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
                                          onClick={() => cancel()}>
                                              <span id="EndAuction">Cancel Auction</span>
-                                         </a>
-                                    <a href="#" class="btn btn-grad btn-lg" data-toggle="modal"
-                                         onClick={() => buyNft()}>
-                                             <span id="EndAuction">Buy Nft</span>
-                                         </a>
+                                         </a> */}
                                 </div>
                             </div>
                         </div>
@@ -663,9 +745,8 @@ const NFTDetail = () => {
                 </div>
             </div>
 
-
-
             <Footer />
+
 
             <div
                 class="modal fade popup"
@@ -691,7 +772,7 @@ const NFTDetail = () => {
                                 <span class="color_black"></span> from
                                 <span class="color_red"></span>
                             </p>
-                            <div class="space-y-10">
+                            <div id="inputp" class="space-y-10">
                                 {/* <p>Minimum Bid = {nftAuctionPrice}</p> */}
                                 <input
                                     type="text"
@@ -716,22 +797,16 @@ const NFTDetail = () => {
 
                             <div class="hr"></div>
                             <div class="d-flex justify-content-between">
-                                <p> You must bid at least:</p>
-                                <p class="text-right color_black txt _bold"> 67,000 ETH </p>
+                                <p> You must bid at least greater than:</p>
+                                <span id="BIDS">{AuctionPrice}</span>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <p> service free:</p>
-                                <p class="text-right color_black txt _bold"> 0.025 ETH </p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p> Total bid amount:</p>
-                                <p class="text-right color_black txt _bold"> 56,031 ETH </p>
-                            </div>
+
                             <button
+                                onClick={() => bidNft(nfts)}
                                 class="btn btn-primary
                           w-full "
                                 aria-label="Close"
-                                onClick={() => bidNft(nfts)}
+
                             > <i
                                 class="ri-auction-line
                 color_white"

@@ -48,13 +48,11 @@ const NFTCard = ({ username, nftid, tokenURI, nftOwner, nftName, nftdescription,
       const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
       const meta = await axios.get(tokenURI)
 
-      let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
-      let maxBid = ethers.utils.formatUnits(i.maxBid.toString(), 'ether')
-      let auctionprice = ethers.utils.formatUnits(i.auctionprice.toString(), 'ether')
+      // let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
+      // let maxBid = ethers.utils.formatUnits(i.maxBid.toString(), 'ether')
+      // let auctionprice = ethers.utils.formatUnits(i.auctionprice.toString(), 'ether')
       let item = {
 
-        price,
-        auctionprice,
         tokenId: i.tokenId.toNumber(),
 
         seller: i.seller,
@@ -74,16 +72,9 @@ const NFTCard = ({ username, nftid, tokenURI, nftOwner, nftName, nftdescription,
 
 
   function Details(nft) {
-    console.log('nft:', nft);
+    // console.log('nft:', nft);
 
     navigate(`/detail?id=${nftid}&tokenURI=${tokenURI}&Name=${nftName}&Owner=${nftOwner}&Price=${nftPrice}&AuctionPrice=${nftAuctionPrice}&NFTDescription=${nftdescription}`);
-
-  }
-
-  function listNFT(nft) {
-    console.log('nft:', nft);
-    navigate(`?id=${nftid}&tokenURI=${tokenURI}&Name=${nftName}&Owner=${nftOwner}&Price=${nftPrice}&AuctionPrice=${nftAuctionPrice}&NFTDescription=${nftdescription}`);
-
 
   }
 
@@ -205,13 +196,13 @@ const NFTCard = ({ username, nftid, tokenURI, nftOwner, nftName, nftdescription,
 																	space-x-10"
               >
                 <i class="ri-vip-crown-line"></i>
-                <p
+                {/* <p
                   class="color_text
 																		txt_sm"
                   style={{ width: "auto" }}
                 >Highest Bid:
                   <span id="highbid"></span>
-                </p>
+                </p> */}
                 <span
                   class="color_black
 																		txt_sm"

@@ -55,19 +55,19 @@ const CardList = ({ list, type = "horizontal" }) => {
       provider
     );
     const data = await contract.fetchMarketItems();
-    let details = await contract.getTokenAuctionDetails(nft.tokenId)
+    // let details = await contract.getTokenAuctionDetails(nft.tokenId)
     // let maxBid = details.maxBid()
-    let maxbid = details.maxBid/1000000000000000000;
-    document.getElementById("highbid").innerHTML = maxbid
-    let active = await contract.getListingDetails(nft.tokenId)
-    console.log(active.isActive)
+    // let maxbid = details.maxBid/1000000000000000000;
+    // document.getElementById("highbid").innerHTML = maxbid
+    // let active = await contract.getListingDetails(nft.tokenId)
+    // console.log(active.isActive)
 
-    if(active.isActive == true){
-      let pricef = "Price"
-    }
-    else{
-      let rpricef = "Reserved Price"
-    }
+    // if(active.isActive == true){
+    //   let pricef = "Price"
+    // }
+    // else{
+    //   let rpricef = "Reserved Price"
+    // }
 
 
     const items = await Promise.all(
@@ -114,19 +114,19 @@ const CardList = ({ list, type = "horizontal" }) => {
     );
 
     /* user will be prompted to pay the asking proces to complete the transaction */
-    let details = await contract.getTokenAuctionDetails(nft.tokenId)
+    // let details = await contract.getTokenAuctionDetails(nft.tokenId)
     // let maxBid = details.maxBid()
-    let maxbid = details.maxBid/1000000000000000000;
-    document.getElementById("highbid").innerHTML = maxbid
-    let active = await contract.getListingDetails(nft.tokenId)
-    console.log(active.isActive)
+    // let maxbid = details.maxBid/1000000000000000000;
+    // document.getElementById("highbid").innerHTML = maxbid
+    // let active = await contract.getListingDetails(nft.tokenId)
+    // console.log(active.isActive)
 
-    if(active.isActive == true){
-      document.getElementById("price").innerHTML = "Price"
-    }
-    else{
-      document.getElementById("price").innerHTML = "Reserved Price"
-    }
+    // if(active.isActive == true){
+    //   document.getElementById("price").innerHTML = "Price"
+    // }
+    // else{
+    //   document.getElementById("price").innerHTML = "Reserved Price"
+    // }
     // await transaction.wait();
     loadNFTs();
 

@@ -956,8 +956,8 @@
       ]
     },
     "D:\\Vmukti\\New folder - Copy\\contracts\\NFTMarketplace.sol": {
-      "lastModificationDate": 1654857898912,
-      "contentHash": "a0b4256bded6ae0ae74894d7b045c11a",
+      "lastModificationDate": 1655374905908,
+      "contentHash": "930bf5809b915f68555408a636dbb5aa",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.4",
