@@ -1,15 +1,9 @@
 
-```
-## Full stack NFT marketplace built with  Solidity, IPFS, & React.js
+# Full stack NFT marketplace built with  Solidity, IPFS, & React.js
 
+[![Build Status](https://torque-nftmarketplace.netlify.app/)](https://torque-nftmarketplace.netlify.app/)
 
-### Running this project
-
-
-To deploy this project to Gitpod, follow these steps:
-
-
-#### Local setup
+# Running in a Local setup:-
 
 To run this project locally, follow these steps.
 
@@ -21,17 +15,18 @@ git clone https://github.com/TORQUE-AMBIPLATFORMS/Torqueverse.git
 cd torqueverse
 
 # install using NPM or Yarn
-npm install
 
+npm install --force
+``` 
 
-1. Start the app
+2. Start the app
 
-```
+```sh
 npm start
 ``` 
 
 
-# User Have To Deploy :-
+# For deploying on a hardhat node :-
 
 1. Start the local Hardhat node
 
@@ -47,18 +42,23 @@ npx hardhat run scripts/deploy.js --network localhost
 
 3. Start the app
 
-```
+```sh
 npm start
 ```
 
 ### Project Execution
-step 1: user has to login with the metamask 
-step 2: Create Page: If user want to upload the NFT then user have to enter the NFT name,description,and price after 
+1. user has to login with the metamask 
+
+2. Create Page: If user want to upload the NFT then user have to enter the NFT name,description,and price after 
 	that user has to pay gas fees and listing price for the same.
-step 3: Marketplace Page: Here user can explore the types of NFTs like images,videos,GIFs,audio and many more and buy from it. 
-step 4: Detail Page: Here user can see details of the NFTs.
-step 5: My NFT Page: Here user can see their owned NFTs. 
-step 6: Daashboard : Here user can see listed NFTs.
+
+3. Marketplace Page: Here user can explore the types of NFTs like images,videos,GIFs,audio and many more and buy from it. 
+
+4. Detail Page: Here user can see details of the NFTs.
+
+5. My NFT Page: Here user can see their owned NFTs. 
+
+6. Daashboard : Here user can see listed NFTs.
 
 ### Configuration
 
