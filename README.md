@@ -3,6 +3,10 @@
 
 [![Build Status](https://torque-nftmarketplace.netlify.app/)](https://torque-nftmarketplace.netlify.app/)
 
+# Prerequisites:-
+
+Before running the project please generate your own .secret file and enter the private key for the account that you wish to utilise for deploying and testing the torqueverse smart contracts.
+
 # Running in a Local setup:-
 
 To run this project locally, follow these steps.
@@ -47,18 +51,17 @@ npm start
 ```
 
 ### Project Execution
-1. user has to login with the metamask 
+1. The user has to login with the metamask 
 
-2. Create Page: If user want to upload the NFT then user have to enter the NFT name,description,and price after 
-	that user has to pay gas fees and listing price for the same.
+2. Create Page: If the user wants to upload an NFT then they need to provide the NFT name, description and price, after that user has to pay the gas fees and listing price for the same.
 
-3. Marketplace Page: Here user can explore the types of NFTs like images,videos,GIFs,audio and many more and buy from it. 
+3. Marketplace Page: Here the user can explore the types of NFTs like images, videos, GIFs, audio and many more as well as buy from the provided collections. 
 
-4. Detail Page: Here user can see details of the NFTs.
+4. Detail Page: User access for details of the NFTs.
 
-5. My NFT Page: Here user can see their owned NFTs. 
+5. My NFT Page: Here the user can see their owned NFT assets. 
 
-6. Daashboard : Here user can see listed NFTs.
+6. Dashboard : Shows all the listed NFTs.
 
 ### Configuration
 
