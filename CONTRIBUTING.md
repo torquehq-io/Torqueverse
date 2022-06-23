@@ -19,6 +19,8 @@ Thank you for investing your time in contributing to our project!
 git clone https://github.com/{{YOUR GITHUB USERNAME}}/nft-marketplace.git
 ```
 
+3. Incase the repository is private you will need to be granted access by one of the admins before you can make any contributions.
+
 ![Clone the forked repository](./assets/clone.png)
 
 3. Open the project folder or run this command `cd nft-marketplace` to change current working directory.
