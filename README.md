@@ -51,11 +51,11 @@ npm start
 ```
 
 ### Project Execution
-1. The user has to login with the metamask 
+1. The user has to login with metamask 
 
-2. Create Page: If the user wants to upload an NFT then they need to provide the NFT name, description and price, after that user has to pay the gas fees and listing price for the same.
+2. Create Page: If the user wants to upload an NFT then they need to provide the NFT name, description and price, after that the user has to pay the gas fees and listing price for the same.
 
-3. Marketplace Page: Here the user can explore the types of NFTs like images, videos, GIFs, audio and many more as well as buy from the provided collections. 
+3. Marketplace Page: Here the user can explore the types of NFTs like images, videos, GIFs, 3D models and many more, as well as buy from the provided collections. 
 
 4. Detail Page: User access for details of the NFTs.
 
